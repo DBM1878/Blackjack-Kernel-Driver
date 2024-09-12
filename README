@@ -1,0 +1,83 @@
+File: blackjack.c
+Author: David Middour
+
+Description:
+This kernel module implements the game blackjack. The user can play a game of blackjack with the computer
+The user will load the module and be able to write to the module.
+The module will repsond to the users commands and will handle playing the game.
+
+
+Important Varibales:
+There are several global variables that keep track of several different things, the main notes:
+playerScore and dealerScore - keep track of the score for both players
+gameState - keeps track of current game state
+msgCode - handles specific responses from the game
+gameMsg - list of specific responses form game
+deck - deck of cards
+
+
+Functions:
+struct miscdevice card_device:
+miscellaneous device structure
+
+struct file_operations card_fops:
+List of fucntions that are called when spcific interaction with module are made
+
+int __init blackjack_init(void):
+Initializer function that registers device and sets initial game state
+
+void __exit blackjack_exit(void):
+Exit funciton that unregisters device
+
+ssize_t blackjack_read():
+Read function that writes to console.
+Prints out responses to the console based on gameState and msgCode.
+Will respond to invalid responses, winners and losers, as well as rulse to play game
+
+int blackjack_open():
+Open function that runs when module is opened, to read from for example, 
+sets variable to prevent Read function form infinitly looping and printing
+
+ssize_t blackjack_write():
+Write function that receives command from user, parses it, and takes the appropriate response.
+If user gives and invalid command, sets msgCode to appropriate error message.
+If valid command, executes game functionality, calling helper functions to reset game, shuffle deck, deal cards to players, deal the player a card, player ends turn, start dealer turn.
+
+void resetGame(void):
+This function resets the game. gameState, playerScore, dealerScore, and deckPos all return to 0
+
+void randomizeDeck(void):
+This function randomizes the deck of cards by swapping array positions 1000 times.
+
+void dealCards(void):
+This function deals cards to the player and dealer.
+Sets player and dealer hands, deckPos, number of cards in player and dealer hands, and calls calcScore() to calculate the score for player and dealer
+
+void calcScore(void):
+This function calculates the current score for the player and dealer.
+
+void checkScores(void):
+This functions checks if either player has reached 21 or exceeded 21.
+In either case it sets the appropriate msgCode.
+
+int checkAces(int player):
+This is a helper function used in checkScores() to determine if either player has any aces and what value those aces hold (1 or 11).
+If either player has aces whose value needs to be adjusted, it adjusts it and rechecks if score is over 21.
+
+void playerHit(void):
+This fucntion deals the player a card and updates playerHand, number of cards in players hand, and deck position.
+Then calls calcScores() and checkScores() to calculate and check the players new score.
+
+void dealerTurn(void):
+This function takes the dealers turn, taking cards until its score is over 17.
+Works like playerHit(), giving the dealer a card and updateing values.
+
+int compareScores(void):
+This function compares the players and dealers scores at the end of the game to determine a winner.
+
+ssize_t printHands(char* buffer, size_t len):
+This function prints the current hand and score of each player to the console.
+
+char printCards(void):
+Unimplemented function
+Would have printed out ASCII art for each of the players cards.
